@@ -1,0 +1,311 @@
+/*YALLASTYLING*/
+/*=== ===*/
+/*=== ===*/
+/*=== ===*/
+
+/* nav {
+    float: right;
+    display: block;
+}
+
+.nav ul {
+  list-style: none;
+  background-color: #444;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+}
+.nav li {
+  font-size: 1.2;
+  line-height: 40px;
+  height: 40px;
+  border-bottom: 1px solid #888;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  display: inline-block;
+}
+ 
+.nav a {
+  text-decoration: none;
+  color: #fff;
+  display: block;
+  transition: .3s background-color;
+}
+ 
+. a:hover {
+  background-color: #005f5f;
+}
+ 
+.nav a.active {
+  background-color: #fff;
+  color: #444;
+  cursor: default;
+}
+ 
+*/
+
+* {
+    font-family: 'Roboto', Helvetica, Arial, sans-serif;
+}
+
+ul {
+    list-style-type: none;
+    background: #5557586b; 
+    margin: 0;
+    padding: 0;
+    padding: 20px;
+}
+
+main {
+    height: calc(100vh - 100px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* The image used */
+    background: linear-gradient(#818182,rgba(0,123,255,.5)), url(../images/bidet-bg.jpg) center / cover no-repeat;
+    height: calc(100vh - 100px);
+}
+
+
+body { 
+
+}
+
+
+}
+
+.bg {
+    opacity:0.5;
+
+}
+
+p {
+    font-weight: 400;
+    color: white;
+    text-shadow: 2px 2px* color: #919191;
+    text-align: middle;
+
+}
+
+a {
+  color: black;
+  text-decoration: initial;
+  transition: all 0.2s ease-in-out;
+}
+
+a:visited {
+  color: black;
+}
+
+a:hover  {
+  color: #f6379e;
+}
+
+
+
+.title {
+
+}
+
+.uppercase {
+
+    text-transform: uppercase;
+}
+
+.main-list li {
+
+}
+
+.container {
+  width: 85%;
+  display: flex;
+  color: white;
+}
+
+.wrapper {
+  margin-right: 50px;
+}
+
+.hero {
+    display: flex;
+    align-items: center;
+    height: calc(100vh - 100px)
+}
+
+
+
+h1 {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 1000;
+}
+
+h1, h2, p {
+  margin: 0;
+  /*padding: 10px;*/
+  flex: 1;
+}
+
+h6 {
+  display: inline-block;
+  margin: 0;
+  padding: 3px;
+}
+
+
+footer {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+  background: #60B0AF;
+  height: 100px;
+}
+
+#logo {
+    margin: auto;
+    padding-top: 30px; 
+    border-bottom:80px solid #f6379e;
+    border-width:0px 0px 30px 0px;
+    border-style:solid solid solid solid;
+    border-color:#000000 #000000 #f6379e #000000;
+    padding-bottom: 35px;
+    box-shadow: 10px 10px #60B0AF;
+
+}
+
+@media screen and (min-width: 1000px) and (min-height: 673px) {
+  .container {
+    width: 65%;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .container {
+    display: initial;
+  }
+
+
+  #logo > img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 39px;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  main {
+    height: auto;
+    padding: 60px 10px;
+  }
+
+@media screen and (max-width: 360px) and (max-height: 646px) {
+
+  .hero {
+    height: auto;
+  }
+}
+
+  main {
+    height: auto;
+    padding: 60px 10px;
+  }
+
+  footer {
+   width: 100%;
+   height: auto; 
+  }
+}
+
+/*iPhone 6/7/8 fix width 667px height 375px  */
+
+@media only screen and (min-device-width: 375px) and (max-device-width: 667px) {
+
+  .hero {
+    display: flex;
+    align-items: center;
+    height: auto;
+}
+
+  main {
+    height: auto;
+    padding: 60px 10px;
+  }
+
+  footer {
+   width: 100%;
+   height: auto;
+  }
+} 
+
+/*@media only screen 
+    and (device-width : 375px) 
+    and (device-height : 667px) 
+    and (-webkit-device-pixel-ratio : 2) {
+
+
+  .hero {
+    display: flex;
+    align-items: center;
+    height: calc (100vh - 100px);
+}
+
+  main {
+    padding: 10px 60px;
+    width: auto;
+    height: calc(100vh - 100px);
+  }
+
+  footer {
+   width: 100%;
+   height: auto; 
+  }
+  }
+  }*/
+
+    }
+
+
+@media only screen and (min-device-width: 414px) and (max-device-width: 736px) {
+
+  .hero {
+    display: flex;
+    align-items: center;
+    height: calc (100vh - 100px);
+}
+
+  main {
+    padding: 10px 60px;
+    width: auto;
+    height: calc(100vh - 100px);
+  }
+
+  footer {
+   width: 100%;
+   height: auto; 
+  }
+  }
+}
+
+#map {
+  height: 400px;
+  width: 400px;
+  background-color: orange;
+
+}
+
+/*header .pull-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding-right: 10px;
+}*/
+
