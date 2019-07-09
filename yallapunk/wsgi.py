@@ -1,5 +1,5 @@
 """
-WSGI config for yalltail project.
+WSGI config for yallapunk project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "yalltail.settings.dev")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "yallapunk.settings.dev")
 
 application = get_wsgi_application()
