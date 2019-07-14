@@ -1,22 +1,27 @@
 FROM lambci/lambda:build-python3.7
 
-WORKDIR /var/task
+ENV PYTHONUNBUFFERED 1
 
-# Fancy prompt to remind you are in zappashell
-RUN echo 'export PS1="\[\e[36m\]zappa>\[\e[m\] "' >> /root/.bashrc
+WORKDIR /var/yallapunk
 
-COPY ../requirements.txt .
+# Add our bash customizations
+COPY .bashrc /root/.bashrc
 
 # Additional RUN commands here
-RUN yum clean all && \
-    yum -y install vim postgresql postgresql-devel mysql mysql-devel
+#RUN yum clean all && \
+#    yum -y install vim postgresql postgresql-devel mysql mysql-devel
 
-RUN pip install -U pip && \
-    pip install -U zappa mysql-python
+RUN pip install -U zappa && pip install -U virtualenv
 
-RUN virtualenv /var/venv && \
-    source /var/venv/bin/activate && \
-    pip install -U pip && \
-    pip install -r requirements.txt
+# Copy the project requirements over
+COPY . .
 
-CMD ["bash"]
+# Initalize and activate our virtual environment
+ENV VIRTUAL_ENV=/var/venv
+RUN python3 -m virtualenv --python=/usr/bin/python3 $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Install dependencies:
+RUN pip install -r requirements.txt
+EXPOSE 8000
+CMD ["python", "manage.py", "runserver"]
