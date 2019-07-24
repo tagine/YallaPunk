@@ -1,0 +1,210 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation Template to create Aurora Postgresql Serverless DB Instance'
+
+###############################################################################
+# Parameters
+###############################################################################
+
+Parameters:
+  ParentVPCStack:
+    Description: 'Provide Stack name of parent VPC.'
+    Type: String
+    MinLength: '1'
+    MaxLength: '128'
+    AllowedPattern: '^[a-zA-Z]+[0-9a-zA-Z\-]*$'
+
+  ParentSSHBastionStack:
+    Description: 'Provide Stack name of parent Amazon Linux bastion host.'
+    Type: String
+    MinLength: '1'
+    MaxLength: '128'
+    AllowedPattern: '^[a-zA-Z]+[0-9a-zA-Z\-]*$'
+
+  DBName:
+    Description: Database Name
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: "^[a-zA-Z]+[0-9a-zA-Z_]*$"
+    ConstraintDescription: Must start with a letter. Only numbers, letters, and _ accepted. max length 64 characters
+
+  DBPort:
+    Description: TCP/IP Port for the Database Instance
+    Type: Number
+    Default: 5432
+    ConstraintDescription: 'Must be in the range [1115-65535]'
+    MinValue: 1115
+    MaxValue: 65535
+
+  DBUsername:
+    Description: Database master username
+    Type: String
+    MinLength: '1'
+    MaxLength: '16'
+    AllowedPattern: "^[a-zA-Z]+[0-9a-zA-Z_]*$"
+    ConstraintDescription: Must start with a letter. Only numbers, letters, and _ accepted. max length 16 characters
+
+  DBPassword:
+    Description: Database master password
+    Type: String
+    MinLength: '10'
+    MaxLength: '25'
+    AllowedPattern: "^[ -~]+$"
+    ConstraintDescription: All characters between 32 and 126 are accepted. max length 25 characters
+
+  DBEngineVersion:
+    Description: Select Database Engine Version
+    Type: String
+    Default: 10.7
+    AllowedValues:
+      - 10.7
+
+  DBSnapshotName:
+    Description: Optional. DB Snapshot ID to restore database. Leave this blank if you are not restoring from a snapshot.
+    Type: String
+    Default: ""
+
+###########################################################################
+# Mandatory tags that will be added to all resources that support tags
+###########################################################################
+
+  EnvironmentStage:
+    Type: String
+    Description: The environment tag is used to designate the Environment Stage of the associated AWS resource.
+    AllowedValues:
+      - dev
+      - test
+      - pre-prod
+      - prod
+    Default: dev
+
+###############################################################################
+# Parameter groups
+###############################################################################
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: Environment
+        Parameters:
+          - EnvironmentStage
+      -
+        Label:
+          default: DB Parameters
+        Parameters:
+          - DBName
+          - DBPort
+          - DBUsername
+          - DBPassword
+          - DBInstanceClass
+          - DBEngineVersion
+          - DBSnapshotName
+          - NotificationList
+      -
+        Label:
+          default: Networking
+        Parameters:
+          - ParentVPCStack
+          - ParentSSHBastionStack
+
+###############################################################################
+# Conditions
+###############################################################################
+Conditions:
+  IsUseDBSnapshot: !Not [!Equals [!Ref DBSnapshotName, ""]]
+  IsNotUseDBSnapshot: !Not [Condition: IsUseDBSnapshot]
+  IsProd: !Equals [!Ref EnvironmentStage, 'prod']
+  IsReplica: !Or [!Equals [!Ref EnvironmentStage, 'pre-prod'], Condition: IsProd]
+
+###############################################################################
+# Resources
+###############################################################################
+
+Resources:
+  DBSubnetGroup:
+    Type: 'AWS::RDS::DBSubnetGroup'
+    Properties:
+      DBSubnetGroupDescription: !Ref 'AWS::StackName'
+      SubnetIds: !Split [',', {'Fn::ImportValue': !Sub '${ParentVPCStack}-SubnetsPrivate'}]
+
+  AuroraDBCluster:
+    Type: AWS::RDS::DBCluster
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+      Engine: aurora-postgresql
+      EngineMode: serverless
+      EngineVersion: !Ref DBEngineVersion
+      ScalingConfiguration:
+        MaxCapacity: 2
+      DatabaseName: !If [IsUseDBSnapshot, !Ref "AWS::NoValue", !Ref DBName]
+      Port: !Ref DBPort
+      MasterUsername:
+        !If [IsUseDBSnapshot, !Ref "AWS::NoValue", !Ref DBUsername]
+      MasterUserPassword:
+        !If [IsUseDBSnapshot, !Ref "AWS::NoValue", !Ref DBPassword]
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VpcSecurityGroupIds:
+      - !Ref ClusterSecurityGroup
+      BackupRetentionPeriod: !If [IsProd, 35, 7]
+      SnapshotIdentifier: !If [IsUseDBSnapshot, !Ref DBSnapshotName, !Ref "AWS::NoValue"]
+      StorageEncrypted:  !If [IsUseDBSnapshot, !Ref "AWS::NoValue", true]
+      Tags:
+        -
+          Key: EnvironmentStage
+          Value: !Ref EnvironmentStage
+
+
+  ClusterSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Ref 'AWS::StackName'
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: !Ref DBPort
+        ToPort: !Ref DBPort
+        SourceSecurityGroupId: {'Fn::ImportValue': !Sub '${ParentSSHBastionStack}-BastionSecurityGroupID'}
+        Description: 'Access to Bastion Host Security Group'
+      VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::StackName}-AuroraClusterSecurityGroup'
+
+  ClusterSecurityGroupIngress:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !GetAtt 'ClusterSecurityGroup.GroupId'
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref ClusterSecurityGroup
+      Description: 'Self Reference'
+
+###############################################################################
+# Outputs
+###############################################################################
+Outputs:
+  ClusterEndpoint:
+    Description: 'Aurora Cluster Endpoint'
+    Value: !GetAtt 'AuroraDBCluster.Endpoint.Address'
+  Port:
+    Description: 'Aurora Endpoint Port'
+    Value: !GetAtt 'AuroraDBCluster.Endpoint.Port'
+  DBUsername:
+    Description: 'Database master username'
+    Value: !Ref DBUsername
+  DBName:
+    Description: 'Database Name'
+    Value: !Ref DBName
+  PSQLCommandLine:
+    Description: PSQL Command Line
+    Value: !Join
+             - ''
+             - - 'psql --host='
+               - !GetAtt 'AuroraDBCluster.Endpoint.Address'
+               - ' --port='
+               - !GetAtt 'AuroraDBCluster.Endpoint.Port'
+               - ' --username='
+               - !Ref DBUsername
+               - ' --dbname='
+               - !Ref DBName
