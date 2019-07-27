@@ -8,3 +8,7 @@ services:
       dockerfile: ./yallapunk/Dockerfile
     ports:
       - "8000:8000"
+    volumes:
+      - .:/var/yallapunk
+    env_file:
+      - zappa.env

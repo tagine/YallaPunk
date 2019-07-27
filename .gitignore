@@ -1,2 +1,4 @@
 .idea
 *.pyc
+yallapunk/config/*
+zappa.env

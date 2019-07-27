@@ -11,10 +11,7 @@ COPY .bashrc /root/.bashrc
 #RUN yum clean all && \
 #    yum -y install vim postgresql postgresql-devel mysql mysql-devel
 
-RUN pip install -U zappa && pip install -U virtualenv
-
-# Copy the project requirements over
-COPY . .
+RUN pip install -U virtualenv
 
 # Initalize and activate our virtual environment
 ENV VIRTUAL_ENV=/var/venv
@@ -22,6 +19,8 @@ RUN python3 -m virtualenv --python=/usr/bin/python3 $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install dependencies:
+COPY ./requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
+#CMD ["sleep", "10m"]
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
