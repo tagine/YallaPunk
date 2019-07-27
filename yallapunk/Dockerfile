@@ -8,14 +8,14 @@ WORKDIR /var/yallapunk
 COPY .bashrc /root/.bashrc
 
 # Additional RUN commands here
-#RUN yum clean all && \
-#    yum -y install vim postgresql postgresql-devel mysql mysql-devel
+RUN yum clean all && \
+    yum -y install vim ipython postgresql96 postgresql96-devel
 
 RUN pip install -U virtualenv
 
 # Initalize and activate our virtual environment
 ENV VIRTUAL_ENV=/var/venv
-RUN python3 -m virtualenv --python=/usr/bin/python3 $VIRTUAL_ENV
+RUN python -m virtualenv --python=/var/lang/bin/python $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install dependencies:

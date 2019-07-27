@@ -1,0 +1,11 @@
+{
+    "production": {
+        "aws_region": "us-east-1",
+        "django_settings": "yallapunk.settings.production",
+        "s3_bucket": "yallapunk-zappa",
+        "vpc_config" : {
+            "SubnetIds": [ "subnet-07b6c2ce3f4657568", "subnet-07872d17e670eed6a" ],
+            "SecurityGroupIds": [ "sg-0639a2a4b7ee0a562" ]
+        }
+    }
+}

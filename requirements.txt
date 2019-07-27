@@ -1,2 +1,9 @@
-Django>=2.0,<2.1
-wagtail>=2.1,<2.2
+# Remember to keep Amazons packages in mind when messing with requirements!
+#   supported packages can be checked with `yum info sqlite`
+# To upgrade Django must first containerize local db to postgres instead of sqlite
+#    amazon doesn't support a high enough version of sqlite
+Django~=2.0.0
+wagtail~=2.1.0
+PyYAML~=3.12.0
+zappa~=0.48.2
+psycopg2~=2.7.0
