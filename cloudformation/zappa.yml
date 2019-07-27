@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: >-
+  Cloudformation template to create resources required for Zappa deployment
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Network Configuration
+        Parameters:
+          - ParentVPCStack
+
+Parameters:
+  ParentVPCStack:
+    Description: 'Stack name of parent VPC stack.'
+    Type: String
+
+Resources:
+  ZappaSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Ref 'AWS::StackName'
+      VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::StackName}-ZappaSecurityGroup'
+
+Outputs:
+  ZappaSecurityGroupID:
+    Description: Use this Security Group to reference incoming traffic from the lambda functions host/instance
+    Value: !Ref ZappaSecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-ZappaSecurityGroupID'
