@@ -331,7 +331,7 @@ Resources:
       DesiredCapacity: '1'
       LaunchConfigurationName: !Ref BastionLaunchConfiguration
       MaxSize: '1'
-      MinSize: '1'
+      MinSize: '0'
       Tags:
       - Key: Name
         Value: !Sub
